@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>单例模式</title>
+</head>
+<body>
+	<script type="text/javascript">
+		//单例模式各个语言都是有的,  JS实现单例模式,可以以闭包的形式, 设定常量等等. 所以JS我认为难点在于没有风格,易点也在于没有风格. 在没接触过其他语言的前提下, 入门容易, 后续深入会比较难. 而学习了其他语言的情况下, 会很不习惯JS的语言, 毕竟是弱类型语言. 所以不管什么语言,好学不好学.都是要接触各种设计模式.没有捷径可以走. 所以前端一点都不简单.甚至很考验人.
+		//惰性单例
+		var LazySingle = function(){
+			var _instance = null;
+			
+			function Single(){
+				return {
+					publicMethod: function(){},
+					publicProperty: function(){}
+				}
+			};
+			
+			return function(){
+				if(_instance){
+					_instance = Single()
+				}
+				return _instance;
+			}
+		}
+	</script>
+</body>
+</html>

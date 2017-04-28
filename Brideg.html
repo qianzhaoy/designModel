@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>桥接模式</title>
+</head>
+<body>
+	桥接主要是将实现层(事件绑定)与抽象层(页面UI逻辑)解耦分离.
+	<script type="text/javascript">
+		//抽象
+		function changColor(dom, color, bg) {
+			dom.style.color = color;
+			dom.style.background = bg
+		}
+		
+		document.getElementById('div').onclick = function(event){
+			var target = event.target
+			changColor(target,'red', '#ddd')
+		};
+	</script>
+</body>
+</html>

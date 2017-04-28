@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>简单工厂</title>
+</head>
+<body>
+	<script type="text/javascript">
+		function createFactory(name,time) {
+			var o = new Object()
+			o.name = name;
+			o.time = time;
+			
+			o.getName = function () {
+				console.log(this.name);
+			}
+			
+			return o
+		}
+		
+		var book = createFactory("q",11)
+		var cook = createFactory("w",22)
+		
+	</script>
+</body>
+</html>

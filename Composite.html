@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>组合模式</title>
+	<style>
+		.Group{
+			margin: 20px 0;
+			background-color: antiquewhite;
+		}
+	</style>
+</head>
+
+<body>
+	又称部分-整体模式, 将对象组合成树形结构以表示"部分整体"的层次结构.使用用于创建HTML
+	<script type="text/javascript">
+		var News = function() {
+			this.children = [];
+			this.element = null;
+		}
+
+		News.prototype = {
+			init: function() {
+				throw new Error("请重写你的方法")
+			},
+			add: function() {
+				throw new Error("请重写你的方法")
+			}
+		}
+
+	</script>
+	<script type="text/javascript">
+		//基类
+		function FormBase() {
+			this.element = null;
+			this.children = [];
+
+		}
+
+		FormBase.prototype = {
+			init: function() {
+				throw new Error("请重写该方法");
+			},
+			add: function(obj) {
+				this.children.push(obj);
+				this.element.appendChild(obj.getElement());
+				return this
+			},
+			getElement: function() {
+				console.log(this);
+				return this.element;
+			}
+		}
+
+		//父类
+		function FormItem(parent) {
+			FormBase.call(this);
+			this.parent = parent;
+			this.init();
+		}
+		FormItem.prototype = new FormBase();
+		FormItem.prototype.constructor = FormItem;
+		FormItem.prototype.init = function() {
+			this.element = document.createElement("form");
+			this.element.className = "Group";
+		};
+
+		FormItem.prototype.show = function() {
+			this.parent.appendChild(this.element);
+		};
+		FormItem.prototype.hide = function() {
+			this.element.style.display = "none";
+		}
+
+		//子类
+		function InputItem(label, id, hint) {
+			FormBase.call(this);
+			this.init(label, id, hint)
+		}
+		InputItem.prototype = new FormBase();
+		InputItem.prototype.constructor = InputItem;
+		InputItem.prototype.init = function(label, id, hint) {
+			this.element = document.createElement('div');
+
+			var bel = document.createElement('label');
+			bel.innerHTML = label;
+			this.element.appendChild(bel);
+
+			var input = document.createElement('input');
+			input.name = id;
+			input.id = id;
+			this.element.appendChild(input);
+
+			var hintText = document.createElement('span');
+			hintText.innerHTML = hint;
+			this.element.appendChild(hintText);
+		}
+
+
+		var form = new FormItem(document.body)
+		form.add(new InputItem('用户名', 'userName', '4-6位数字或字母')).add(new InputItem('密码', 'password', '4-6位数字或字母')).add(new InputItem('用户名', 'userName', '4-6位数字或字母')).show()
+
+
+		var formTwo = new FormItem(document.body)
+		formTwo.add(new InputItem('用户名', 'userName', '4-6位数字或字母')).add(new InputItem('密码', 'password', '4-6位数字或字母')).add(new InputItem('用户名', 'userName', '4-6位数字或字母')).show()
+	</script>
+</body>
+
+</html>

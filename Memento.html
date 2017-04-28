@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>备忘录模式</title>
+</head>
+<body>
+	<p>缓存数据,减少资源的浪费.比如每页的数据缓存</p>
+	<p>简单的来说就是把资源进行缓存</p>
+	
+	<script type="text/javascript">
+		
+		var Pages = (function(){
+			//缓存对象
+			var ceche = {};
+			
+			//主函数
+			// page: 页数, fn: 成功回调函数
+			return function(page,fn){
+				if(cache[page]) {
+					//showPage为页面展示代码. 省略...
+					showPage(page, cache[page]);
+					fn && fn();
+				}else{
+					//若缓存中没有该数据, 执行请求
+					$.post("....", {},function(data){
+						showPage(page, data);
+						cache[page] = data
+						fn && fn();
+					})
+				}
+			}
+			
+		}());
+	</script>
+</body>
+</html>

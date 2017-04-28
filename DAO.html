@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>数据访问对象模式</title>
+</head>
+
+<body>
+	全称 data access object;
+<button id="remove">button</button>
+	<script type="text/javascript">
+		var BaseLocalStorage = function(preId, timeSign) {
+			//定义本地存储的前缀
+			this.preId = preId;
+			//定义时间戳与存储数据之间的拼接符
+			this.timeSign = timeSign || "|-|";
+		}
+
+		BaseLocalStorage.prototype = {
+			status: {
+				SUCCESS: 0, //成功
+				FAILURE: 1, //失败
+				OVERFLOW: 2, //溢出
+				TIMEOUT: 3 //超时
+			},
+
+			storage: localStorage || window.localStorage,
+
+			getKey: function(key) {
+				return this.preId + key;
+			},
+
+			set: function(key, value, callback, time) {
+				var status = this.status.SUCCESS;
+				var key = this.getKey(key);
+				try{
+					time = new Date(time).getTime() || time.getTime();
+				}catch(e){
+					//为传入事件参数或者时间参数有误获取默认时间: 一个月
+					time = new Date().getTime() + 1000 * 60 * 60 * 24 * 31;
+				}
+				
+				try{
+					this.storage.setItem(key, time + this.timeSign + value);
+				}catch(e){
+					status = this.status.OVERFLOW;
+				}
+
+				callback && callback.call(this, status, key, value);
+			},
+
+			get: function(key, callback) {
+				var status = this.status.SUCCESS,
+						key = this.getKey(key),
+						value = null,
+						timeSignLen = this.timeSign.length,
+						self = this,
+						index,
+						time,
+						result;
+				
+				try{
+					value = self.storage.getItem(key);
+				}catch(e){
+					result = {
+						status: self.status.FAILURE,
+						value: null
+					};
+					callback && callback.call(this,result.status, result.value);
+					return result;
+				};
+				
+				if(value){
+					index = value.indexOf(self.timeSign);
+					time = value.slice(0, index);
+					
+					if(time > new Date().getTime() || time == 0){
+						value = value.slice(index + timeSignLen);
+					}else{
+						value = null;
+						status = self.status.TIMEOUT;
+						self.remove(key);
+					}
+				}else{
+					status = self.status.FAILURE;
+				}
+				
+				result = {
+					status: status,
+					value: value
+				}
+				
+				callback && callback.call(this, result.status, result.value);
+				return result;
+				
+			},
+
+			remove: function(key, callback) {
+				var status = this.status.FAILURE,
+						key = this.getKey(key),
+						value = null;
+				
+				try{
+					value = this.storage.getItem(key)
+				}catch(e){};
+				
+				if(value){
+					try{
+						this.storage.removeItem(key)
+						status = this.status.SUCCESS;
+					}catch(e){}
+				}
+				callback && callback.call(this, status, status > 0 ? null : value.slice(value.indexOf(this.timeSign) + this.timeSign.length ) )
+			}
+
+		}
+
+		
+		var base = new BaseLocalStorage('p')
+		
+		base.set('name', 'qianzhaoy', function(status, key, value){
+			console.log(status);
+		})	
+		
+		
+		document.getElementById('remove').onclick = function(){
+			base.get("name", function(status,value){
+				console.log(status,value);
+			})
+			base.remove("name", function(status,value){
+				console.log(status,value);
+			})
+		};
+	</script>
+</body>
+
+</html>

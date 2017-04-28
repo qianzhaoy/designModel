@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>继承</title>
+</head>
+<body>
+	<script type="text/javascript">
+		//最简单的继承
+		function SuperClass() {
+			this.name = ["abc"];
+		}
+		
+		function ChildClass() {
+			this.abc = "abc"
+		}
+		
+		ChildClass.prototype = new SuperClass()
+		
+		var instance1 = new ChildClass()
+		var instance2 = new ChildClass()
+
+		// 如果父类里面有引用类型的话 多个子类实例会导致 数据共享 形成BUG
+		instance1.name.push("1")
+		console.log(instance2.name);
+	</script>
+	<script type="text/javascript">
+		//组合式继承
+		//数据单独作用域, 原型也能继承, 缺点是实例化了两遍
+		function Super() {
+			this.name = [1,2,3]
+		}
+		
+		function Child() {
+			Super.call(this)//组合继承的重点
+		}
+		Child.prototype = new Super()
+	</script>
+	
+	<script type="text/javascript">
+		//原型继承
+		function inheritObject(o) {
+			function F(){}
+			F.prototype = o;
+			return new F()
+		}
+		
+		//		寄生继承
+		function exObj(obj) {
+			var o = new inheritObject(obj)
+			o.getName = function(){
+				console.log(1);
+			}
+			
+			return o
+		}
+		
+	</script>
+	
+	<script type="text/javascript">
+		//寄生组合继承
+		
+		function inheritObject(o) {
+			function F(){}
+			F.prototype = o;
+			return new F()
+		}
+		
+		function inheritPrototype(childClass, superClass) {
+			var p = inheritObject(superClass.prototype)
+			p.constructor = childClass;
+			childClass.prototype = superClass.prototype;
+		}
+		
+		function Super1(name) {
+			this.name = 1
+			this.color = [1,2,3]
+		}
+		
+		Super.prototype.getColor = function() {
+			console.log(this.color);
+		}
+		
+		function Child(name) {
+			Super1.call(this,name);
+		}
+		
+		inheritPrototype(Child, Super)
+		
+		
+		var intance12 = new Child("q")
+		var intance23 = new Child("l")
+		intance12.color.push(10)
+		console.log(intance12);
+		intance12.getColor()
+		intance23.getColor()
+	</script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>等待者模式</title>
+</head>
+
+<body>
+
+	通过对多个异步进程监听, 来触发未来发生的动作. 就是 promise 吧
+	<script type="text/javascript">
+		var Waiter = function() {
+			var dfd = [],
+
+				doneArr = [],
+
+				failArr = [],
+
+				slide = Array.prototype.slice,
+
+				that = this;
+
+			var Primise = function() {
+				this.resolved = false;
+				this.rejected = false;
+			}
+
+			Primise.prototype = {
+				resolve: function() {
+					this.resolved = true;
+					if (!dfd.length) return;
+
+					for (var i = dfd.length - 1; i >= 0; i--) {
+						//如果有任意一个监控对象没有被解决或者解决失败则返回
+						if (dfd[i] && !dfd[i].resolved || dfd[i].rejected) {
+							return;
+						}
+						//清除监控对象
+						dfd.splice(i, 1);
+					}
+					//执行解决成功的回调方法
+					_exec(doneArr);
+				},
+				reject: function() {
+					this.rejected = true;
+					if (!dfd.length) return;
+
+					//清除所有监控对象
+					dfd.splice(0);
+					_exec(failArr);
+				}
+			}
+			//创建监控对象
+			that.Deferred = function() {
+				return new Primise();
+			}
+
+			//回调方法
+			function _exec(arr) {
+				var i = 0,
+					len = arr.length;
+				for (; i < len; i++) {
+					try {
+						arr[i] && arr[i]();
+					} catch (e) {}
+				}
+			};
+
+			//监控异步方法 参数: 监控对象
+			// when 方法就是要将监测对象放入监测对象容器中
+			that.when = function() {
+				dfd = slide.call(arguments);
+				var i = dfd.length;
+				for (--i; i >= 0; i--) {
+					if (!dfd[i] || dfd[i].resolved || dfd[i].rejected || !dfd[i] instanceof Primise) {
+						dfd.splice(i, 1)
+					}
+				}
+				return that;
+			}
+
+			//解决成功回调函数添加方法
+			that.done = function() {
+				doneArr = doneArr.concat(slide.call(argumens));
+				return that;
+			}
+
+			//解决失败回调方法
+			that.fail = function() {
+				failArr = failArr.concat(slide.call(argumens));
+				return that;
+			}
+
+		}
+
+	</script>
+</body>
+
+</html>

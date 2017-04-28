@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>外观模式</title>
+	<link rel="stylesheet" href="static/css/Facade.css">
+</head>
+<body>
+	<div id="contant"></div>
+	
+	<script type="text/javascript">
+		//如事件绑定
+		//DOM0级事件, 重写会覆盖
+		document.onclick = function(){}
+		
+		//应该使用DOM2级事件 document.addEventListener, 但是要考虑兼容. 所以封装一下
+		//这算就是外观模式了吧
+		function addEvent(dom, type, fn){
+			if(dom.addEventListener){
+				dom.addEventListener(type, fn, false)
+			}else if(dom.attachEvent){
+				dom.attachEvent("on"+ type, fn)
+			}else{
+				dom['on' + type] = fn
+			} 
+		}
+		
+		
+	
+		function getStyle(dom) {
+			/*利用判断是否支持currentStyle（是否为ie）*/
+			var finalStyle = dom.currentStyle ? dom.currentStyle : document.defaultView.getComputedStyle(dom, null);
+			console.log(finalStyle.border);
+			console.log(finalStyle.backgroundColor);
+			console.log(finalStyle.width);
+		}
+		
+		getStyle(document.getElementById('contant'))
+	</script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>简单模板模式</title>
+</head>
+
+<body>
+	<div id="content"></div>
+	<script type="text/javascript">
+		function formateString(str, data) {
+			console.log(data);
+			return str.replace(/\{#(\w+)#\}/g, function(match, key) {
+				return typeof data[key] === undefined ? "" : data[key];
+			})
+		}
+		var span = formateString("<span>{#span#}</span>", {
+			span: "qianzhaoy"
+		})
+		
+		document.getElementById('content').innerHTML = span;
+
+	</script>
+</body>
+
+</html>

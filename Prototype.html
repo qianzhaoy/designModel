@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>原型模式</title>
+</head>
+<body>
+	<script type="text/javascript">
+		//使用原型继承的模式
+		var LoopImages = function(imgArr, container){
+			this.imagersArray = imgArr;
+			this.container = container;
+		}
+		
+		LoopImages.fn = {
+			createImage: function(){
+				console.log("image is create");
+			},
+			changeImage: function(){
+				throw new Error("你必须重写该方法")
+			},
+			addMethod: function(name, fn){
+				this[name] = fn
+			}
+		};
+		
+		var SlideLoopImg = function(imgArr, container){
+			LoopImages.call(this, imgArr,container);
+		}
+		// 我觉的这么写可以,不知道有什么毛病没有
+		//书上是 SlideLoopImg.prototype =new LoopImages();
+		SlideLoopImg.prototype = LoopImages.fn;
+		
+		SlideLoopImg.prototype.changeImage = function(){
+			console.log("SlideImage");
+		}
+		
+		var FadeImage = function(imgArr, container){
+			LoopImages.call(this, imgArr,container);
+		}
+		
+		FadeImage.prototype = LoopImages.fn
+		FadeImage.prototype.changeImage = function(){
+			console.log("FadeImage");
+		}
+		
+		var slide = new SlideLoopImg([1,2,3],'slide')
+		var fade = new FadeImage([1,2,3,5],'fade')
+		
+		LoopImages.fn.addMethod("getImage", function(){
+			console.log(this.imagersArray);
+		})
+		
+		
+		slide.getImage()
+	</script>
+</body>
+</html>

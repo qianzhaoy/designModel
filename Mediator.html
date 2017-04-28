@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>中介者模式</title>
+</head>
+
+<body>
+	<p>类似观察者模式,但是关注重点不一样, 观察者模式关注的是订阅方. 而中介者模式关注的是接收方. 一个函数 function chang(){}; 观察者	需要 regist(chang), 等于多个regist, 一个fire; 这样关注点就在了regist方, 我只管fire就是了, 让regist更加灵活; 
+	</p>
+	<p>而中介者则是var mediator = return {chang()}; 等于一个regist, 多个fire. 其实就是不同的逻辑调不同的函数或者传不同参数, 只是封装在一个对象里. 感觉没什么技术含量还是理解的不对? 让订阅方调用 mediator.change(参数)实现逻辑;
+	</p>
+	
+	
+
+	<script type="text/javascript">
+		window.onload = function() {
+			var stock = {
+				"red": 5,
+				"black": 8
+			};
+
+			document.querySelector("#color").onchange = function() {
+				//fire
+				mediator.change(this);
+			};
+
+			document.querySelector("#number").oninput = function() {
+				//fire
+				mediator.change(this);
+			};
+			
+			//中介者
+			var mediator = (function() {
+				var colorObj = document.querySelector("#color"),
+					numberObj = document.querySelector("#number"),
+					colorInfo = document.querySelector("#colorInfo"),
+					numberInfo = document.querySelector("#numberInfo"),
+					button = document.querySelector("#submit");
+				return {
+					change: function(obj) {
+						if (obj === colorObj) {
+							colorInfo.innerHTML = "颜色：" + colorObj.value;
+						} else if (obj === numberObj) {
+							numberInfo.innerHTML = "数量：" + numberObj.value;
+						}
+						if (!colorObj.value) {
+							button.disabled = true;
+							button.innerHTML = "请选择颜色";
+							return;
+						}
+						if (!numberObj.value || (((numberObj.value - 0) | 0) !== numberObj.value - 0)) {
+							button.disabled = true;
+							button.innerHTML = "请输入正确的数量";
+							return;
+						}
+						if (numberObj.value > stock[colorObj.value]) {
+							button.disabled = true;
+							button.innerHTML = "库存不足";
+							return;
+						}
+						button.disabled = false;
+						button.innerHTML = "确认订单";
+					}
+				};
+			})();
+		};
+
+	</script>
+</body>
+
+</html>

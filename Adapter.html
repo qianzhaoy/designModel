@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>适配器模式</title>
+</head>
+<body>
+	<script type="text/javascript">
+		 //jquery适配,  如果使用自己的库 A. 可以写一个适配  window.A = A = jQuery
+		
+		// 数据适配, 如果后段返回的数据是数组, 写一个适配器, 转化为我们需要的数据. 如果后段改变数据, 只要改变适配器的函数就可以了
+		
+		//数据适配器函数
+		function ajaxAdapter(data) {
+			return {
+				name: data[1],
+				type: data[2],
+				age: data[3]
+			}
+		}
+		
+		$.ajax({
+			url:"###",
+			success:function(data){
+				//doSomething(ajaxAdapter(data))
+			}
+		})
+	</script>
+</body>
+</html>

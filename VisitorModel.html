@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>访问者模式</title>
+</head>
+
+<body>
+	<button id="demo">button</button> 访问者模式可以理解为 对操作对象不直接进行修改的情况下, 去封装他, 拓展他, 返回一个新的对象
+
+	<script type="text/javascript">
+		var bindEvent = function(dom, type, fn, data) {
+			if (dom.addEventListener) {
+				dom.addEventListener(type, fn, false);
+			} else if (dom.attachEvent) {
+				//原本是这样
+				//dom.attachEvent("on" + type, fn)
+
+				//经过访问者模式修正
+				bindIEEvent(dom, type, fn, data)
+			} else {
+				dom["on" + type] = fn
+			}
+		}
+
+		var demo = document.getElementById('demo');
+
+		// 在IE中, attachEvent 的回调函数里的this 是指向window的, 所以这里IE中会有BUG
+		bindEvent(demo, "click", function() {
+			this.style.background = "red"
+		})
+
+
+		//所以需要访问者模式, 可以理解为对操作对象不直接进行修改的情况下, 去封装他.
+		function bindIEEvent(dom, type, fn, data) {
+			var data = data || [];
+			dom.attachEvent("on" + type, function(e) {
+				fn.call(dom, e, data); //这样做的话相当于事件回调里面多了一个参数data, 而不是原来的只有一个 event 参数了
+			});
+		}
+
+	</script>
+	<script type="text/javascript">
+		//		## 类数组访问器
+		//    ## 对象模拟数组
+		//    ## Array.prototype.splice.apply(arguments, args); 数组的方法用在object上也是可以的结果是{0: 1, length: 1}, 形成类数组结构.
+		var Visitor = (function() {
+			return {
+				splice: function() {
+					var args = Array.prototype.slice.call(arguments, 1);
+					return Array.prototype.splice.apply(arguments[0], args);
+				},
+				push: function() {
+					//arguments[0]参数表示这个对象
+					var len = arguments[0].length || 0;
+					var args = this.splice(arguments, 1);
+					arguments[0].length = len + arguments.length - 1;
+					return Array.prototype.push.apply(arguments[0], args);
+				}
+			}
+		}())
+		
+		var a = new Object()
+		
+		Visitor.push(a, 1, 2, 3)
+		
+		console.log(a);
+
+	</script>
+</body>
+
+</html>

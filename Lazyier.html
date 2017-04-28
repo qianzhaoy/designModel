@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>惰性模式</title>
+</head>
+
+<body>
+	减少每次代码执行时的重复性的分支判断, 通过对对象重定义来屏蔽原对象中的分支判断. 例如典型的事件判定的兼容性写法, 各种能力检测.
+	<button type="button" id="btn">button</button>
+	<script type="text/javascript">
+		//第一次加载的时候性能有损失.
+		var on = (function(dom, type, fn) {
+			if (document.addEventListener) {
+				return function(dom, type, fn) {
+					dom.addEventListener(type, fn, false);
+				}
+			} else if (dom.attachEvent) {
+				return function(dom, type, fn) {
+					dom.attachEvent('on' + type, fn);
+				}
+			} else {
+				return function(dom, type, fn) {
+					dom['on' + type] = fn;
+				}
+			}
+		})();
+
+		//第一次加载的时候性能不损失, 第一次调用的时候有损失.
+		var on = function(dom, type, fn) {
+			if (document.addEventListener) {
+				on = function(dom, type, fn) {
+					dom.addEventListener(type, fn, false);
+				}
+			} else if (dom.attachEvent) {
+				on = function(dom, type, fn) {
+					dom.attachEvent('on' + type, fn);
+				}
+			} else {
+				on = function(dom, type, fn) {
+					dom['on' + type] = fn;
+				}
+			}
+			on(dom, type, fn);
+		}
+
+		
+		
+		on(document.getElementById('btn'), 'click', function(){
+			alert(1)
+		});
+	</script>
+</body>
+
+</html>

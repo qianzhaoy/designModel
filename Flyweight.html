@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>享元模式</title>
+</head>
+<body>
+	运用共享技术有效地支持大量的细粒度的对象, 避免对象空间拥有相同内容造成多余的开销.
+	<script type="text/javascript">
+		// 做翻页的话就可以只操作这几个元素了.不会生成冗余的dom
+		var Flyweight = function(){
+			var created = [];
+			
+			function crtate(){
+				var dom = document.createElement('div');
+				document.getElementById('container').appendChild(dom);
+				created.push(dom)
+				return dom;
+			}
+			
+			return {
+				getDiv: function(){
+					if(created.length < 5){
+						return create();
+					}else{
+						var div = created.shift();
+						created.push(div);
+						return div
+					}
+				}
+			}
+		}
+	</script>
+</body>
+</html>

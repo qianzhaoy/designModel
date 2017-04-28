@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>工厂模式</title>
+</head>
+<body>
+	<script type="text/javascript">
+		// 安全的创建工厂类
+		// 给类创建一个类工厂
+		var Factory = function(type, content){
+			if ( this instanceof Factory ){
+				var s = new this[type](content);
+				return s
+			}else{
+				return new Factory(type,content);
+			}
+		}
+		
+		Factory.prototype = {
+			java: function(){},
+			php: function(){},
+			ui : function(){}
+		}
+		
+		
+	</script>
+</body>
+</html>

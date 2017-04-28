@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>状态模式</title>
+</head>
+
+<body>
+	如果有多个不同的状态要判断的话可以使用这种模式
+
+	<script type="text/javascript">
+		var ResultState = (function() {
+			var State = {
+				state0: function() {
+					console.log("0");
+				},
+				state1: function() {
+					console.log("1");
+				},
+				state2: function() {
+					console.log("2");
+				},
+				state3: function() {
+					console.log("3");
+				},
+				state4: function() {
+					console.log("4");
+				}
+			};
+
+			function show(result) {
+				State["state" + result] && State["state" + result]()
+			}
+
+			return {
+				show: show
+			}
+		}());
+
+		ResultState.show(3)
+
+	</script>
+
+	<script type="text/javascript">
+		var MarryState = function() {
+			this._currentState = {};
+			this.states = {
+				jump: function() {
+					console.log("jump");
+				},
+				move: function() {
+					console.log("move");
+				},
+				shoot: function() {
+					console.log("shoot");
+				}
+			}
+		}
+
+		var Action = {
+			constructor: MarryState,
+			changeState: function() {
+				var arg = arguments;
+				this._currentState = {};
+
+				if (arg.length) {
+					for (var i = 0; i < arg.length; i++) {
+						this._currentState[arg[i]] = true
+					}
+				}
+				return this
+			},
+
+			do: function() {
+				for (prop in this._currentState) {
+					if (this._currentState.hasOwnProperty(prop)) {
+						this.states[prop] && this.states[prop]()
+					}
+				}
+				return this
+			}
+		}
+
+		MarryState.prototype = Action
+
+
+
+		var marry = new MarryState()
+		console.log(marry);
+		marry.changeState("jump","move").do()
+	</script>
+</body>
+
+</html>

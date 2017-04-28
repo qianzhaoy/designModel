@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>观察者模式</title>
+</head>
+
+<body>
+	解决对象间的解耦 或者说是协同工作的解耦
+
+	<p>
+		知道了通用的观察者模式的原理——中介对象之后，我们就可以来看一个实际的例子。假如在一个项目中，我负责写一个 ajax 模块，在该模块执行过后，需要调用来自其他同学的各种模块，比如说插入图片啊、渲染一个组件啊、blablabla。那么我们可（bu）能（yao）这样写：
+		<code><br>
+   ajax.success(function(data) {<br>
+    	appendImg.init(data);<br><br>
+    	renderWidget.render(data);<br>
+    	blablabla.init(data);<br>
+	});<br>
+</code> 
+	然后突然有一天需要在ajax成功返回数据之后添加一个新功能，那么写新功能模块的同学就要联系我，让我在我的 ajax 代码的回调里再添加一条
+	</p>
+	<ul id="fire">
+	</ul>
+	<textarea id="text"></textarea>
+
+	<button id="submit" type="button">提交</button>
+
+	<script type="text/javascript">
+		//观察者    
+		// ** 观察者模式的优点在于订阅者可以随意订阅发布的信息.  重点在订阅者!!!(大写+桥黑板), 分清楚和中介者模式的区别
+		var Observer = (function() {
+			var __message = {}
+			return {
+				regist: function(type, fn) {
+					if (typeof __message[type] === "undefined") {
+						__message[type] = [fn]
+					} else {
+						__message[type].push(fn)
+					}
+				},
+
+				fire: function(type, args) {
+					if (!__message[type]) return;
+
+					var events = {
+							type: type
+						},
+						i = 0,
+						len = __message[type].length;
+
+					for (prop in args) {
+						if (args.hasOwnProperty(prop)) {
+							events[prop] = events[prop] || args[prop]
+						}
+					}
+
+					for (; i < len; i++) {
+						__message[type][i].call(this, events)
+					}
+
+				},
+
+				remove: function(type, fn) {
+					if (__message[type] instanceof Array) {
+						var i = __message[type].length - 1;
+						for (; i >= 0; i--) {
+							__message[type][i] === fn && __message[type].splice(i, 1)
+						}
+					}
+				}
+			}
+		}());
+
+	</script>
+	<script type="text/javascript">
+		(function() {
+			//订阅者 相当于这个功能的职责人
+			function addList(e) {
+				var text = e.text
+				var li = document.createElement("li");
+
+				li.innerHTML = text
+				document.getElementById('fire').appendChild(li);
+			}
+			Observer.regist("addList", addList)
+		}());
+
+		(function() {
+			//我负责写这个功能,并且需要调用另外几个的功能
+			document.getElementById('submit').onclick = function() {
+				var text = document.getElementById('text').value;
+				//我发布这个消息
+				Observer.fire('addList', {
+					text: text
+				});
+				
+			}
+		}());
+
+		(function(){
+			//想在我的功能里, 添加新功能的时候,只要订阅 addList 就行了, 而不需要在我的功能里在 fire 一个他写的新函数, 相当于他拥有了功能添加的自主权;
+			Observer.regist("addList",{})
+		}());
+		
+	</script>
+</body>
+
+</html>

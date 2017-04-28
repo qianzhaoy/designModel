@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>命令模式</title>
+</head>
+
+<body>
+	命令模式就是传不同的参数调用不同的函数, 一个参数是命令一个参数是函数所需的形参 . 命令所需的函数还是以闭包的形式获取, 作为私有变量 {command:"命令",params:{}}
+
+	<canvas id="ctx" width="500px" height="500px" style="border:1px solid #000"></canvas>
+
+	<script type="text/javascript">
+		window.requestAnimFrame = (function() {
+			return window.requestAnimationFrame ||
+				window.webkitRequestAnimationFrame ||
+				window.mozRequestAnimationFrame ||
+				function(callback) {
+					window.setTimeout(callback, 1000 / 60);
+				};
+		})();
+
+		var viewCommand = (function() {
+			var canvas = document.getElementById('ctx');
+			var ctx = canvas.getContext("2d");
+			var centerX = canvas.width / 2;
+			var centerY = canvas.height / 2;
+			var timer;
+			var Radius = 0;
+
+			var Action = {
+				init: function(radius) {
+					ctx.clearRect(0, 0, canvas.width, canvas.height);
+					Radius = radius || 0;
+					var now = new Date(),
+						Hours = now.getHours() - 12,
+						Minutes = now.getMinutes(),
+						Seconds = now.getSeconds();
+					//时间刻度长度
+					var lineHeight = 10;
+
+					//时针长度
+					var HourLineH = centerY - 40;
+
+					//分针长度
+					var MinLineH = centerY - 50;
+
+					//秒针长度
+					var SecLineH = centerY - 60;
+
+					//画时钟边框
+					ctx.beginPath()
+					ctx.arc(centerX, centerY, Radius, 0, 2 * Math.PI);
+					ctx.stroke();
+
+					//画时钟中心点
+					ctx.beginPath()
+					ctx.arc(centerX, centerY, Radius / 20, 0, 2 * Math.PI);
+					ctx.fill();
+					ctx.stroke();
+
+					//画时间刻度
+					for (var i = 0; i < 12; i++) {
+						ctx.beginPath();
+						ctx.save();
+						rotateCanvas(ctx, 30 * i);
+						ctx.moveTo(centerX, centerY - Radius);
+						ctx.lineTo(centerX, centerY - Radius + lineHeight);
+						ctx.stroke();
+						ctx.restore();
+					}
+
+					//画时针
+					ctx.beginPath();
+					ctx.save();
+					var hourAngle = 30 * Hours + 0.5 * Minutes;
+					rotateCanvas(ctx, hourAngle);
+					ctx.moveTo(centerX, centerY);
+					ctx.lineTo(centerX, HourLineH);
+					ctx.stroke();
+					ctx.restore();
+
+					//画分针
+					ctx.beginPath();
+					ctx.save();
+					var minAngle = (360 / 60) * Minutes;
+					rotateCanvas(ctx, minAngle);
+					ctx.moveTo(centerX, centerY);
+					ctx.lineTo(centerX, MinLineH);
+					ctx.stroke();
+					ctx.restore();
+
+					//画秒针
+					ctx.beginPath();
+					ctx.save();
+					var secAngle = (360 / 60) * Seconds;
+					rotateCanvas(ctx, secAngle);
+					ctx.moveTo(centerX, centerY);
+					ctx.lineTo(centerX, SecLineH);
+					ctx.stroke();
+					ctx.restore();
+
+					timer = requestAnimFrame(function() {
+						Action.init(Radius)
+					})
+				},
+
+				timeStop: function() {
+					cancelAnimationFrame(timer)
+				},
+				
+				timeStart: function() {
+					timer = requestAnimFrame(function() {
+						Action.init(Radius)
+					})
+				}
+			}
+
+			function rotateCanvas(canvas, deg) {
+				canvas.translate(centerX, centerY)
+				canvas.rotate(deg * Math.PI / 180);
+				canvas.translate(-centerX, -centerY);
+			}
+
+
+			return function(msg) {
+				if (!msg) return false;
+
+				if (msg.length) {
+					for (var i = 0; i < msg.length; i++)
+						arguments.callee(msg[i])
+				} else {
+					msg.param = msg.param || [];
+					msg.param = Object.prototype.toString.call(msg.param) === "[object Array]" ? msg.param : [msg.param]
+
+					Action[msg.command].apply(Action, msg.param)
+				}
+			}
+
+		}());
+
+		viewCommand({
+			command: 'init',
+			param: [80]
+		})
+	</script>
+</body>
+
+</html>

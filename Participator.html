@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>参与者模式</title>
+</head>
+
+<body>
+	在特定作用域中执行给定的函数, 并将参数原封不动的传递.
+	<button id="content">button</button>
+	<p id="ptn">111111</p>
+	<script type="text/javascript">
+		// 比如 这里的handle不知道怎么在点击的时候传参数, 只能在外面再套一层 function(){}, 但这样的做法不优雅.
+		// 修改后可以这样传递参数, 但是不方便解除绑定
+		function handle(e, data) {
+			console.log(data.name, data.age);
+		}
+
+		//##修改前
+		//		function addEvent(dom, type, fn) {
+		//			if (dom.addEventListener) {
+		//				dom.addEventListener(type, fn, false)
+		//			} else if (dom.attachEvent) {
+		//				dom.attachEvent("on" + type, fn)
+		//			} else {
+		//				dom['on' + type] = fn
+		//			}
+		//		}
+
+		//##修改后  利用call传递data
+		function addEvent(dom, type, fn, data) {
+			if (dom.addEventListener) {
+				dom.addEventListener(type, function(e){
+					fn.call(dom, e, data)
+				}, false)
+			} else if (dom.attachEvent) {
+				dom.attachEvent("on" + type, fn)
+			} else {
+				dom['on' + type] = fn
+			}
+		}
+
+		addEvent(document.getElementById('content'), 'click', handle, {
+			name: 1,
+			age: 2
+		})
+
+	</script>
+	<script type="text/javascript">
+		// 函数绑定方法 bind 实现
+
+		function bind(fn, context) {
+			return function() {
+				return fn.apply(context, arguments)
+			}
+		}
+		
+		var button = document.getElementById('content');
+		var ptn = document.getElementById('ptn');
+		
+		function demoFn() {
+			console.log(arguments, this);
+		}
+		//未绑定对象
+		var bindFn = bind(demoFn);
+		button.addEventListener('click', bindFn)
+		
+//		var bindFn = bind(demoFn, button);
+//		var bindFn = bind(demoFn, ptn);
+//		
+//		button.removeEventListener('click', bindFn);
+	</script>
+	<script type="text/javascript">
+		// 兼容版本
+		if(Function.prototype.bind === undefined){
+			Function.prototype.bind = function(context){
+				var Slice = Array.prototype.slice,
+						args = Slice.call(arguments, 1),
+						that = this;
+				
+				return function(){
+					var addArgs = Slice.call(arguments),
+							allArgs = args.concat(addArgs);
+					return that.apply(context, allArgs);
+				}
+			}
+		}
+	</script>
+</body>
+
+</html>

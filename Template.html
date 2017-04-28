@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>模板方法模式</title>
+</head>
+<body>
+
+	<script type="text/javascript">
+		var Alert = function(data){
+			if(!data) return;
+			
+			//内容
+			this.content = data.content;
+			//创建提示框
+			this.panel = document.createElement('div');
+			//提示内容
+			this.contentNode = document.createElement("p");
+			//确定
+			this.confirmBtn = document.createElement('span');
+			//关闭
+			this.closeBtn = document.createElement('b');
+			
+			this.panel.className = 'alert';
+			this.closeBtn.className = 'a-close';
+			this.confirmBtn.className = 'a-confirm';
+			this.confirmBtn.innerHTML = data.confirmText || "确认";
+			
+			this.contentNode.innerHTML = this.content;
+			this.success = data.success || function(){};
+			this.fail = data.fail || function(){};
+		}
+		
+		Alert.prototype = {
+			constructor: Alert,
+			init: function(){
+				this.panel.appendChild(this.closeBtn)
+				this.panel.appendChild(this.contentNode)
+				this.panel.appendChild(this.confirmBtn)
+				
+				document.body.appendChild(this.panel)
+				
+				this.bindEvent()
+				this.show()
+			},
+			bindEvent: function(){
+				var self = this;
+				self.closeBtn.addEventListener('click', function(e){
+					 self.fail();
+					 self.hide();
+				},false)
+			},
+			hide: function(){
+				this.panel.style.display = 'none'
+			},
+			show: function(){
+				this.panel.style.display = ""
+			}
+		}
+		
+		
+		//右侧按钮的提示框
+		
+		var RightAlert = function(data){
+			Alert.call(this, data);
+			this.confirmBtn.className += " right"; 
+		}
+		
+		RightAlert.prototype = new Alert();
+	</script>
+	
+	<script type="text/javascript">
+		
+	</script>
+</body>
+</html>

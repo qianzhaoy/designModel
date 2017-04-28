@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>链模式</title>
+</head>
+<body>
+	
+	详情见jquery
+	<script type="text/javascript">
+		var A = function(){
+			return new A.fn.init()
+		}
+		
+		A.fn = A.prototype = {
+			constructor: A,
+			init:function(){this.a = 1},
+			abc: function(){}
+		}
+		
+		A.fn.init.prototype = A.fn;
+		
+		console.log(A());
+	</script>
+</body>
+</html>

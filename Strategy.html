@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>策略模式</title>
+</head>
+
+<body>
+	策略模式!!! 算法和逻辑分开 类似状态管理, 不同的状态实现不同的算法, 返回不同的结果
+	<from id="fomrs">
+		<input type="text" id="a" data-check="noNull">
+		<input type="text" id="b" data-check="number">
+		<input type="text" id="c" data-check="noNull">
+		<input type="text" id="d" data-check="phone">
+	</from>
+	<button type="button" id="btn">button</button>
+
+	<script type="text/javascript">
+		(function(window) {
+			//算法
+			var strategy = {
+				noNull: function(value) {
+					return /\S+/.test((value)) ? true : false
+				},
+				number: function(value) {
+					return /^[0-9]+(\.[0-9+])?$/.test(value) ? true : false
+				},
+				phone: function(value) {
+					return /^1[34578]\d{9}$/.test(value) ? true : false
+				}
+			};
+
+			//策略类
+			var inputStrategy = function(fromID) {
+				var checkObj = [],
+					froms = document.getElementById(fromID),
+					i = 0,
+					child = froms && froms.children;
+
+				this.checkObj = checkObj
+
+				if (!froms) return false;
+
+				for (; i < child.length; i++) {
+					var checkType = child[i].getAttribute('data-check');
+					if (!!checkType && !!strategy[checkType]) {
+						checkObj.push(child[i]);
+					}
+				}
+			}
+
+			inputStrategy.prototype.start = function() {
+				var checkObj = this.checkObj
+				var result = true
+				checkObj.forEach(function(dom) {
+					var type = dom.getAttribute("data-check");
+					if (!strategy[type](dom.value)) {
+						result = false;
+						return;
+					}
+				});
+				return result
+			}
+			
+			inputStrategy.prototype.addRuler = function(type, fn){
+				strategy[type] = fn
+			}
+
+			window.inputStrategy = inputStrategy
+			
+		}(window));
+
+
+
+		var myinput = new inputStrategy("fomrs")
+
+		document.getElementById('btn').onclick = function() {
+			var result = myinput.start()
+			console.log(result);
+		};
+
+
+	</script>
+</body>
+
+</html>

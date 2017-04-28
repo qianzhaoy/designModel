@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>节流模式</title>
+	<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+	<script src="https://cdn.bootcss.com/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+	<style>
+		*{
+			margin: 0;padding: 0
+		}
+		#back{
+			position: absolute;
+			top: 300px;
+			left: 0;
+			width: 100px;
+			height: 100px;
+			background-color: aqua
+		}
+	</style>
+</head>
+<body>
+	节流优化
+	<div id="back"></div>
+	<div style="height:3000px;background:black"></div>
+	<script type="text/javascript">
+		function extend() {
+			var i = 1,
+					len = arguments.length,
+					target = arguments[0],
+					j;
+			
+			if(i == len){
+				target = this;
+				i--;
+			}
+			for( ; i < len; i++){
+				for (j in arguments[i]) {
+					target[i] = arguments[i][j];
+				}
+			}
+			return target;
+		}
+	</script>
+	<script type="text/javascript">
+		
+		//节流器
+		var throttle = function(){
+			var isClear = arguments[0],fn;
+			
+			if(typeof isClear === 'boolean'){
+				fn = arguments[1];
+				fn.__throttleID && clearTimeout(fn.__throttleID);
+			}else{
+				fn = isClear;
+				param = arguments[1];
+				
+				var p = extend({
+					content: null,
+					args: [],
+					time: 300
+				},param);
+				
+				arguments.callee(true, fn);
+				fn.__throttleID = setTimeout(function() {
+					fn.apply(p.context, p.args);
+				}, p.time);
+			}
+		}
+	</script>
+	
+	<script type="text/javascript">
+		function moveScroll() {
+			var top = $(document).scrollTop();
+			console.log(1);
+			$("#back").animate({
+				top: top + 300
+			},400, 'easeInOutQuint')
+		}
+		
+		$(window).on('scroll', function(){
+			throttle(moveScroll);
+		})
+	</script>
+</body>
+</html>

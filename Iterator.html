@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>迭代模式</title>
+</head>
+<body>
+	在不暴露对象内部结构的情况下, 可以顺序地访问聚合对象内部的元素;
+	<script type="text/javascript">
+		
+		var A = {
+			client:{
+				user:{
+					username:"qianzhaoyan"
+				}
+			}
+		}
+		//同步变量迭代器
+		//## 好处是不会报错,如果数据不确定的情况下
+		
+		var AGetter = function(key){
+			if(!A) return undefined;
+			
+			var result = A;
+			key = key.split('.');
+			
+			for(var i = 0 ; i < key.length ; i++){
+				if(result[key[i]] !== undefined){
+					result = result[key[i]];
+				}else{
+					return undefined;
+				}
+			}
+			
+			return result;
+		}
+		
+		console.log(AGetter("client.user.username"));
+	</script>	
+</body>
+</html>
